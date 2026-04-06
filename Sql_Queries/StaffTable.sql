@@ -1,0 +1,6 @@
+CREATE TABLE Staff (
+    StaffID INT PRIMARY KEY IDENTITY,
+    Name NVARCHAR(100),
+    Role NVARCHAR(50)
+);
+

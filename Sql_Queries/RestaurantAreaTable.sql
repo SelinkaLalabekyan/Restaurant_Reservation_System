@@ -1,0 +1,5 @@
+CREATE TABLE RestaurantArea (
+    AreaID INT PRIMARY KEY IDENTITY,
+    Name NVARCHAR(50) NOT NULL
+);
+

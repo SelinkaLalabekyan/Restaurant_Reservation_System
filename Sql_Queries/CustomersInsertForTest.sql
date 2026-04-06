@@ -1,0 +1,60 @@
+INSERT INTO Customer (Name, Phone, Email) VALUES
+('Aram Petrosyan', '+37477111211', 'aram.petrosyan@gmail.com'),
+('Anna Hakobyan', '+37477111212', 'anna.hakobyan@gmail.com'),
+('Karen Grigoryan', '+37477111213', 'karen.grigoryan@gmail.com'),
+('Mariam Sargsyan', '+37477111214', 'mariam.sargsyan@gmail.com'),
+('Tigran Manukyan', '+37477111215', 'tigran.manukyan@gmail.com'),
+
+('David Harutyunyan', '+37477111216', 'david.harutyunyan@gmail.com'),
+('Lilit Avetisyan', '+37477111217', 'lilit.avetisyan@gmail.com'),
+('Gor Vardanyan', '+37477111218', 'gor.vardanyan@gmail.com'),
+('Narek Melkonyan', '+37477111219', 'narek.melkonyan@gmail.com'),
+('Ani Karapetyan', '+37477111220', 'ani.karapetyan@gmail.com'),
+
+('Hayk Sahakyan', '+37477111221', 'hayk.sahakyan@gmail.com'),
+('Sona Martirosyan', '+37477111222', 'sona.martirosyan@gmail.com'),
+('Levon Baghdasaryan', '+37477111223', 'levon.baghdasaryan@gmail.com'),
+('Ruzanna Petrosyan', '+37477111224', 'ruzanna.petrosyan@gmail.com'),
+('Vahagn Hovhannisyan', '+37477111225', 'vahagn.hovhannisyan@gmail.com'),
+
+('Ashot Mkrtchyan', '+37477111226', 'ashot.mkrtchyan@gmail.com'),
+('Hasmik Stepanyan', '+37477111227', 'hasmik.stepanyan@gmail.com'),
+('Artur Papikyan', '+37477111228', 'artur.papikyan@gmail.com'),
+('Karine Gasparyan', '+37477111229', 'karine.gasparyan@gmail.com'),
+('Arsen Galstyan', '+37477111230', 'arsen.galstyan@gmail.com'),
+
+('Edgar Aleksanyan', '+37477111231', 'edgar.aleksanyan@gmail.com'),
+('Lusine Khachatryan', '+37477111232', 'lusine.khachatryan@gmail.com'),
+('Samvel Grigoryan', '+37477111233', 'samvel.grigoryan@gmail.com'),
+('Gayane Petrosyan', '+37477111234', 'gayane.petrosyan@gmail.com'),
+('Ruben Harutyunyan', '+37477111235', 'ruben.harutyunyan@gmail.com'),
+
+('Armine Vardanyan', '+37477111236', 'armine.vardanyan@gmail.com'),
+('Gagik Hovhannisyan', '+37477111237', 'gagik.hovhannisyan@gmail.com'),
+('Tatevik Avetisyan', '+37477111238', 'tatevik.avetisyan@gmail.com'),
+('Hrant Sargsyan', '+37477111239', 'hrant.sargsyan@gmail.com'),
+('Susanna Manukyan', '+37477111240', 'susanna.manukyan@gmail.com'),
+
+('Grigor Melkonyan', '+37477111241', 'grigor.melkonyan@gmail.com'),
+('Narine Karapetyan', '+37477111242', 'narine.karapetyan@gmail.com'),
+('Arman Sahakyan', '+37477111243', 'arman.sahakyan@gmail.com'),
+('Liana Martirosyan', '+37477111244', 'liana.martirosyan@gmail.com'),
+('Sevak Baghdasaryan', '+37477111245', 'sevak.baghdasaryan@gmail.com'),
+
+('Mher Petrosyan', '+37477111246', 'mher.petrosyan@gmail.com'),
+('Alina Hovhannisyan', '+37477111247', 'alina.hovhannisyan@gmail.com'),
+('Gevorg Mkrtchyan', '+37477111248', 'gevorg.mkrtchyan@gmail.com'),
+('Zara Stepanyan', '+37477111249', 'zara.stepanyan@gmail.com'),
+('Aren Papikyan', '+37477111250', 'aren.papikyan@gmail.com'),
+
+('Milena Gasparyan', '+37477111251', 'milena.gasparyan@gmail.com'),
+('Artak Galstyan', '+37477111252', 'artak.galstyan@gmail.com'),
+('Kristine Aleksanyan', '+37477111253', 'kristine.aleksanyan@gmail.com'),
+('Vardan Khachatryan', '+37477111254', 'vardan.khachatryan@gmail.com'),
+('Emma Grigoryan', '+37477111255', 'emma.grigoryan@gmail.com'),
+
+('Norayr Petrosyan', '+37477111256', 'norayr.petrosyan@gmail.com'),
+('Marine Harutyunyan', '+37477111257', 'marine.harutyunyan@gmail.com'),
+('Arpine Vardanyan', '+37477111258', 'arpine.vardanyan@gmail.com'),
+('Hakob Hovhannisyan', '+37477111259', 'hakob.hovhannisyan@gmail.com'),
+('Lusik Avetisyan', '+37477111260', 'lusik.avetisyan@gmail.com');
