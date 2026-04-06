@@ -1,0 +1,338 @@
+﻿@model List<RestaurantApi.Models.ViewModels.ReservationViewModel>
+
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+        color: white;
+        margin: 0;
+    }
+
+    .container {
+        padding: 30px;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    button {
+        background: #6c5ce7;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 15px;
+        transition: 0.3s;
+        position: relative;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    .delete {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        cursor: pointer;
+        font-size: 18px;
+        color: #ff6b6b;
+        opacity: 0.7;
+        transition: 0.2s;
+    }
+
+        .delete:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: #2a2a40;
+        padding: 25px;
+        border-radius: 16px;
+        width: 320px;
+    }
+
+    input, select {
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #4caf50;
+        padding: 10px 20px;
+        border-radius: 10px;
+        display: none;
+    }
+
+    #searchInput {
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        width: 200px;
+    }
+     
+</style>
+
+<div class="container">
+
+    <div class="header">
+        <h2>🍽 Reservations</h2>
+
+        <input id="searchInput" placeholder="Search..." onkeyup="search()" />
+
+        <div style="display:flex; gap:10px;">
+            <button onclick="location.href='/CustomerMvc'">👤 Customers</button>
+            <button onclick="openModal()">+ Add</button>
+        </div>
+    </div>
+
+    <!-- LIST -->
+    <div id="list">
+        @foreach (var item in Model)
+        {
+            <div class="card">
+                <div class="delete" onclick="deleteItem(@item.Id)">🗑</div>
+
+                <h3>@item.CustomerName</h3>
+                <p>📅 @item.Date</p>
+                <p>⏰ @item.Time</p>
+                <p>👥 Guests: @item.GuestCount</p>
+                <p>🪑 @item.TableInfo</p>
+            </div>
+        }
+    </div>        
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <h3>New Reservation</h3>
+
+        <input id="customerName" placeholder="Customer Name" />
+        <input id="customerPhone" placeholder="Phone" />
+        <input id="customerEmail" placeholder="Email" />
+
+        <select id="tableId"></select>
+
+        <input id="date" type="date" />
+        <input id="startTime" type="time" />
+        <input id="endTime" type="time" />
+
+        <select id="staffId"></select>
+
+        <input id="guests" placeholder="Guests" />
+
+        <br><br>
+
+        <button onclick="create()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+
+    function openModal() {
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    function toast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 2000);
+    }
+
+    function search() {
+        let val = document.getElementById('searchInput').value.toLowerCase();
+
+        document.querySelectorAll('.card').forEach(card => {
+            let text = card.innerText.toLowerCase();
+            card.style.display = text.includes(val) ? 'block' : 'none';
+        });
+    }
+       
+    async function loadPage() {
+        let data = await fetch(`/api/reservation`)
+        .then(r => r.json());
+
+        const container = document.getElementById('list');
+        container.innerHTML = '';
+
+        data.forEach(item => {
+            container.innerHTML += `
+                <div class="card">
+                    <div class="delete" onclick="deleteItem(${item.reservationId})">🗑</div>
+
+                    <h3>${item.customer?.name ?? 'No name'}</h3>
+                    <p>📅 ${item.reservationDate ?? ''}</p>
+                    <p>⏰ ${item.startTime ?? ''}</p>
+                    <p>👥 Guests: ${item.guestCount ?? 0}</p>
+                    <p>🪑 Table: ${item.tableId}</p>
+                </div>
+            `;
+              updatePageInfo();
+        });
+    }
+      
+
+    async function deleteItem(id) {
+        if (!confirm("Delete reservation?")) return;
+
+        await fetch('/api/reservation/' + id, {
+            method: 'DELETE'
+        });
+
+        toast("Deleted ❌");
+        loadPage();
+    }
+
+       async function create() {
+        const data = {
+            name: document.getElementById('customerName').value,
+            phone: document.getElementById('customerPhone').value,
+            email: document.getElementById('customerEmail').value,
+
+            tableId: parseInt(document.getElementById('tableId').value),
+            staffId: parseInt(document.getElementById('staffId').value),
+
+            date: document.getElementById('date').value,
+
+            startTime: document.getElementById('startTime').value + ":00",
+            endTime: document.getElementById('endTime').value + ":00",
+
+            guestCount: parseInt(document.getElementById('guests').value)
+        };
+
+        // VALIDATION
+
+        if (!data.name) return toast("Enter name ❗");
+
+        if (!data.email) return toast("Enter email ❗");
+
+        // Razor-safe email check
+        if (!data.email.includes("@@"))
+            return toast("Invalid email ❗");
+
+        if (!data.tableId) return toast("Select table ❗");
+
+        if (!data.staffId) return toast("Select staff ❗");
+
+        if (!data.date) return toast("Select date ❗");
+
+        if (!data.startTime) return toast("Select start time ❗");
+
+        if (!data.endTime) return toast("Select end time ❗");
+
+        if (!data.guestCount || data.guestCount <= 0)
+            return toast("Invalid guests ❗");
+
+        console.log("CREATE DATA:", data);
+
+        try {
+            const res = await fetch('/api/reservation/create-dto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                toast("Created 🚀");
+                closeModal();
+                loadPage();
+            } else {
+                const err = await res.text();
+                toast(err || "Error ❌");
+                console.error("SERVER ERROR:", err);
+            }
+        } catch (e) {
+            console.error("NETWORK ERROR:", e);
+            toast("Network error ❌");
+        }
+    }
+
+    async function loadTables() {
+        let tables = await fetch('/api/reservation/tables')
+            .then(r => r.json());
+
+        let t = document.getElementById('tableId');
+
+        t.innerHTML = `<option value="">Select Table</option>`;
+
+        tables.forEach(x => {
+            t.innerHTML += `
+                <option value="${x.tableId}">
+                    Table ${x.tableId} (cap: ${x.capacity})
+                </option>`;
+        });
+    }
+
+    function updatePageInfo() {
+    document.getElementById('pageInfo').innerText = "Page " + page;
+    }
+
+    async function loadStaff() {
+        let staff = await fetch('/api/reservation/staff')
+            .then(r => r.json());
+
+        let s = document.getElementById('staffId');
+
+        s.innerHTML = `<option value="">Select Staff</option>`;
+
+        staff.forEach(x => {
+            s.innerHTML += `
+                <option value="${x.staffId}">
+                    ${x.name} (${x.role})
+                </option>`;
+        });
+    }
+
+
+
+    loadTables();
+    loadStaff();
+    loadPage(); 
+
+</script>

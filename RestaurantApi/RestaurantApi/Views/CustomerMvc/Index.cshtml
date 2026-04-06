@@ -1,0 +1,234 @@
+﻿@model List<RestaurantApi.Models.Customer>
+
+@{
+    Layout = null;
+}
+
+<style>
+body {
+    margin: 0;
+    font-family: Inter;
+    background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+    color: white;
+}
+
+.container {
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+input {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    width: 220px;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+    position: relative;
+}
+
+.actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.btn:hover {
+    opacity: 0.7;
+}
+
+button {
+    background: #6c5ce7;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+/* modal */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #2f2f45;
+    padding: 25px;
+    border-radius: 15px;
+    width: 350px;
+    color: white;
+}
+
+.modal-content input {
+    width: 100%;
+    margin-top: 10px;
+}
+</style>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>👤 Customers</h2>
+
+        <input id="searchInput" placeholder="Search..." onkeyup="search()" />
+
+        <button onclick="location.href='/ReservationMvc'">
+            🍽 Reservations
+        </button>
+    </div>
+
+    <!-- LIST -->
+    <div id="list">
+        @foreach (var c in Model)
+        {
+            <div class="card">
+
+                <div class="actions">
+
+                    <!-- EDIT -->
+                    <div class="btn"
+                         onclick="openEdit(this)"
+                         data-id="@c.CustomerId"
+                         data-name="@c.Name"
+                         data-phone="@c.Phone"
+                         data-email="@c.Email">
+                        ✏️
+                    </div>
+
+                    <!-- DELETE -->
+                    <div class="btn"
+                         onclick="deleteCustomer(@c.CustomerId)">
+                        🗑️
+                    </div>
+
+                </div>
+
+                <h3>@c.Name</h3>
+
+                <div>📞 @c.Phone</div>
+                <div>📧 @c.Email</div>
+
+                <div>📊 Reservations: @(c.Reservations?.Count ?? 0)</div>
+
+            </div>
+        }
+    </div>
+
+</div>
+
+<!-- 🔥 EDIT MODAL -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+
+        <h3>Edit Customer</h3>
+
+        <input id="editName" placeholder="Name" />
+        <input id="editPhone" placeholder="Phone" />
+        <input id="editEmail" placeholder="Email" />
+
+        <br><br>
+
+        <button onclick="saveEdit()">Save</button>
+        <button onclick="closeEdit()">Cancel</button>
+
+    </div>
+</div>
+
+<!-- 🔥 JS -->
+<script>
+
+function search() {
+    const value = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.card');
+
+    cards.forEach(c => {
+        const text = c.innerText.toLowerCase();
+        c.style.display = text.includes(value) ? 'block' : 'none';
+    });
+}
+
+let editId = null;
+
+function openEdit(el) {
+    editId = el.dataset.id;
+
+    document.getElementById('editName').value = el.dataset.name || '';
+    document.getElementById('editPhone').value = el.dataset.phone || '';
+    document.getElementById('editEmail').value = el.dataset.email || '';
+
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeEdit() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+async function saveEdit() {
+
+    const data = {
+        customerId: parseInt(editId),
+        name: document.getElementById('editName').value,
+        phone: document.getElementById('editPhone').value,
+        email: document.getElementById('editEmail').value
+    };
+
+    // validation
+    if (!data.name) return alert("Enter name");
+    if (!data.email) return alert("Enter email");
+    if (!data.email.includes("@@")) return alert("Invalid email");
+
+    const res = await fetch('/api/customer/' + editId, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        closeEdit();
+        location.reload();
+    } else {
+        const err = await res.text();
+        alert(err);
+    }
+}
+
+async function deleteCustomer(id) {
+
+    if (!confirm("Delete customer?")) return;
+
+    const res = await fetch('/api/customer/' + id, {
+        method: 'DELETE'
+    });
+
+    if (res.ok) {
+        location.reload();
+    } else {
+        const err = await res.text();
+        alert(err);
+    }
+}
+
+</script>
