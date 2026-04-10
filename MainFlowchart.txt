@@ -1,0 +1,50 @@
+Start (Oval)
+
+↓
+Select Customer / Enter Customer Data (Parallelogram)
+
+↓
+Enter Guest Count (Parallelogram)
+
+↓
+Select Date & Time (Parallelogram)
+
+↓
+Find Available Tables (by Date & Time) (Process - Rectangle)
+
+↓
+Capacity >= Guests? (Decision - Diamond)
+   ├── No →
+   │      Show "No suitable tables" (Parallelogram)
+   │      ↓
+   │      End (Oval)
+   │
+   └── Yes →
+          ↓
+       Select Table (Parallelogram)
+
+          ↓
+       Time Conflict? (Decision - Diamond)
+          ├── Yes →
+          │      Show "Time conflict" (Parallelogram)
+          │      ↓
+          │      End (Oval)
+          │
+          └── No →
+                 ↓
+              Assign Available Staff (Process - Rectangle)
+
+                 ↓
+              Create Reservation (Process - Rectangle)
+
+                 ↓
+              Validate Data (Process - Rectangle)
+
+                 ↓
+              Save to Database (Process - Rectangle)
+
+                 ↓
+              Show Success Message (Parallelogram)
+
+                 ↓
+              End (Oval)

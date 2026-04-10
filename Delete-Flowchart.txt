@@ -1,0 +1,40 @@
+Start (Oval)
+
+↓
+Select Customer (Parallelogram)
+
+↓
+Check Active Reservations (Process - Rectangle)
+
+↓
+Has Active Reservations? (Decision - Diamond)
+   ├── Yes →
+   │      Show "Cannot delete customer with active reservations" (Parallelogram)
+   │      ↓
+   │      End (Oval)
+   │
+   └── No →
+          ↓
+       Begin Transaction (Process - Rectangle)
+
+          ↓
+       Delete Customer (Process - Rectangle)
+
+          ↓
+       Error Occurred? (Decision - Diamond)
+          ├── Yes →
+          │      Rollback Transaction (Process - Rectangle)
+          │      ↓
+          │      Show Error Message (Parallelogram)
+          │      ↓
+          │      End (Oval)
+          │
+          └── No →
+                 ↓
+              Commit Transaction (Process - Rectangle)
+
+                 ↓
+              Show Success Message (Parallelogram)
+
+                 ↓
+              End (Oval)
