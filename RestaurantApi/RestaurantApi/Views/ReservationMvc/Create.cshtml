@@ -1,0 +1,37 @@
+﻿@model RestaurantApi.Models.Reservation
+
+<h2>Create Reservation</h2>
+
+<form asp-action="Create" method="post">
+    <div>
+        <label>Customer Id</label>
+        <input asp-for="CustomerId" />
+    </div>
+
+    <div>
+        <label>Table Id</label>
+        <input asp-for="TableId" />
+    </div>
+
+    <div>
+        <label>Date</label>
+        <input asp-for="ReservationDate" type="date" />
+    </div>
+
+    <div>
+        <label>Start Time</label>
+        <input asp-for="StartTime" type="time" />
+    </div>
+
+    <div>
+        <label>End Time</label>
+        <input asp-for="EndTime" type="time" />
+    </div>
+
+    <div>
+        <label>Guests</label>
+        <input asp-for="GuestCount" />
+    </div>
+
+    <button type="submit">Save</button>
+</form>

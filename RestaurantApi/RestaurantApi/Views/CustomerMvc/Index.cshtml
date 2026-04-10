@@ -1,0 +1,391 @@
+﻿@model List<RestaurantApi.Models.Customer>
+
+@{
+    Layout = null;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+        color: white;
+        transition: all 0.4s ease;
+    }
+
+        body.light {
+            background: #f5f6fa;
+            color: #2d3436;
+        }
+
+    .container {
+        padding: 30px;
+    }
+
+    .header {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 15px;
+    }
+
+    button {
+        background: #0077b6;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 15px rgba(0,119,182,0.4);
+    }
+
+        button:hover {
+            background: #0096c7;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,150,199,0.6);
+        }
+
+    body.light button {
+        background: #dfe6e9;
+        color: #2d3436;
+        box-shadow: none;
+    }
+
+        body.light button:hover {
+            background: #b2bec3;
+        }
+
+    .btn-delete {
+        color: #ff6b6b;
+    }
+
+        .btn-delete:hover {
+            color: red;
+        }
+
+    .search-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    #searchInput {
+        width: 60%;
+        max-width: 500px;
+        min-width: 250px;
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    body.light #searchInput {
+        background: #ecf0f1;
+        color: #2d3436;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(12px);
+        padding: 15px;
+        border-radius: 16px;
+        margin-top: 15px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    body.light .card {
+        background: white;
+        color: #2d3436;
+    }
+
+    .card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+        .btn:hover {
+            transform: scale(1.2);
+        }
+
+    .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: #2f2f45;
+        padding: 25px;
+        border-radius: 16px;
+        width: 350px;
+    }
+
+    body.light .modal-content {
+        background: white;
+        color: #2d3436;
+    }
+
+    /* 🔥 TOAST */
+    .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 9999;
+    }
+
+    .toast {
+        min-width: 260px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        color: white;
+        position: relative;
+        animation: slideIn 0.3s ease;
+        overflow: hidden;
+    }
+
+        .toast.success {
+            background: #00b894;
+        }
+
+        .toast.error {
+            background: #d63031;
+        }
+
+        .toast .close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .toast .progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.7);
+            width: 100%;
+            animation: progressAnim linear forwards;
+        }
+
+    @@keyframes progressAnim {
+        from {
+            width: 100%;
+        }
+
+        to {
+            width: 0%;
+        }
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="container">
+
+    <div class="header">
+
+        <h2>👤 Customers</h2>
+
+        <div class="search-wrapper">
+            <input id="searchInput" placeholder="Search..." onkeyup="search()" />
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button onclick="toggleTheme()">🌙 / ☀️</button>
+            <button onclick="location.href='/ReservationMvc'">🍽 Reservations</button>
+        </div>
+
+    </div>
+
+    <div id="list">
+        @foreach (var c in Model)
+        {
+            <div class="card">
+
+                <div class="actions">
+
+                    <div class="btn"
+                         onclick="openEdit(this)"
+                         data-id="@c.CustomerId"
+                         data-name="@c.Name"
+                         data-phone="@c.Phone"
+                         data-email="@c.Email">
+                        ✏️
+                    </div>
+
+                    <div class="btn btn-delete"
+                         onclick="deleteCustomer(@c.CustomerId)">
+                        🗑️
+                    </div>
+
+                </div>
+
+                <h3>@c.Name</h3>
+
+                <div>📞 @c.Phone</div>
+                <div>📧 @c.Email</div>
+
+                <div>📊 Reservations: @(c.Reservations?.Count ?? 0)</div>
+
+            </div>
+        }
+    </div>
+
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+
+        <h3>Edit Customer</h3>
+
+        <input id="editName" />
+        <input id="editPhone" />
+        <input id="editEmail" />
+
+        <br><br>
+
+        <button onclick="saveEdit()">Save</button>
+        <button onclick="closeEdit()">Cancel</button>
+
+    </div>
+</div>
+
+<!-- 🔥 TOAST CONTAINER -->
+<div id="toastContainer" class="toast-container"></div>
+
+<script>
+
+    let editId = null;
+
+    // THEME
+    function toggleTheme() {
+        const isLight = document.body.classList.toggle('light');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    }
+
+    (function () {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light') document.body.classList.add('light');
+    })();
+
+    // SEARCH
+    function search() {
+        const val = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.card').forEach(c => {
+            c.style.display = c.innerText.toLowerCase().includes(val) ? 'block' : 'none';
+        });
+    }
+
+    // EDIT
+    function openEdit(el) {
+        editId = el.dataset.id;
+
+        document.getElementById('editName').value = el.dataset.name || '';
+        document.getElementById('editPhone').value = el.dataset.phone || '';
+        document.getElementById('editEmail').value = el.dataset.email || '';
+
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEdit() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // SAVE
+    async function saveEdit() {
+
+        const data = {
+            customerId: parseInt(editId),
+            name: document.getElementById('editName').value,
+            phone: document.getElementById('editPhone').value,
+            email: document.getElementById('editEmail').value
+        };
+
+        const res = await fetch('/api/customer/' + editId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            showToast("Updated ✅", "success");
+            setTimeout(() => location.reload(), 600);
+        } else {
+            showToast(await res.text(), "error");
+        }
+    }
+
+    // DELETE
+    async function deleteCustomer(id) {
+        if (!confirm("Delete customer?")) return;
+
+        const res = await fetch('/api/customer/' + id, { method: 'DELETE' });
+
+        if (res.ok) {
+            showToast("Deleted 🗑️", "success");
+            setTimeout(() => location.reload(), 600);
+        } else {
+            showToast(await res.text(), "error");
+        }
+    }
+
+    // 🔥 TOAST FUNCTION
+    function showToast(message, type = "success", duration = 4000) {
+        const container = document.getElementById('toastContainer');
+
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+
+        toast.innerHTML = `
+            ${message}
+            <span class="close">✖</span>
+            <div class="progress" style="animation-duration:${duration}ms"></div>
+        `;
+
+        container.appendChild(toast);
+
+        toast.querySelector('.close').onclick = () => toast.remove();
+
+        setTimeout(() => toast.remove(), duration);
+    }
+
+</script>

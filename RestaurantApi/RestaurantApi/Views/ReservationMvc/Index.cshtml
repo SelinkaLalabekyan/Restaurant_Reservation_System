@@ -1,0 +1,509 @@
+﻿@model List<RestaurantApi.Models.ViewModels.ReservationViewModel>
+
+@{
+    Layout = null;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+        color: white;
+        transition: 0.4s;
+    }
+
+        body.light {
+            background: #f5f6fa;
+            color: #2d3436;
+        }
+
+    .container {
+        padding: 30px;
+    }
+
+    .header {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 15px;
+    }
+
+    button {
+        background: #0077b6;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        transition: 0.25s;
+        box-shadow: 0 4px 15px rgba(0,119,182,0.4);
+    }
+
+        button:hover {
+            background: #0096c7;
+            transform: translateY(-2px);
+        }
+
+    body.light button {
+        background: #dfe6e9;
+        color: #2d3436;
+        box-shadow: none;
+    }
+
+    .search-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    #searchInput {
+        width: 60%;
+        max-width: 500px;
+        min-width: 250px;
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    body.light #searchInput {
+        background: #ecf0f1;
+        color: #2d3436;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(12px);
+        padding: 15px;
+        border-radius: 16px;
+        margin-top: 15px;
+        position: relative;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    body.light .card {
+        background: white;
+    }
+
+    .card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 15px rgba(0,119,182,0.4);
+    }
+
+    .actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+        .btn:hover {
+            transform: scale(1.2);
+        }
+
+    .btn-delete {
+        color: #ff6b6b;
+    }
+
+    .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: #2f2f45;
+        padding: 25px;
+        border-radius: 16px;
+        width: 350px;
+    }
+
+    body.light .modal-content {
+        background: white;
+        color: #2d3436;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        margin-top: 10px;
+    }
+
+    .status-confirmed {
+        color: #006400;
+    }
+
+    .status-pending {
+        color: orange;
+    }
+
+    .status-cancelled {
+        color: red;
+    }
+
+    .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 9999;
+    }
+
+    .toast {
+        min-width: 260px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        color: white;
+        position: relative;
+        animation: slideIn 0.3s ease;
+        overflow: hidden;
+    }
+
+        .toast.success {
+            background: #00b894;
+        }
+
+        .toast.error {
+            background: #d63031;
+        }
+
+        .toast .close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .toast .progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.7);
+            width: 100%;
+            animation: progressAnim linear forwards;
+        }
+
+    @@keyframes progressAnim {
+        from {
+            width: 100%;
+        }
+
+        to {
+            width: 0%;
+        }
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="container">
+
+    <div class="header">
+        <h2>🍽 Reservations</h2>
+
+        <div class="search-wrapper">
+            <input id="searchInput" placeholder="Search..." onkeyup="search()" />
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button onclick="toggleTheme()">🌙 / ☀️</button>
+            <button onclick="location.href='/CustomerMvc'">👤 Customers</button>
+            <button onclick="openModal()">+ Add</button>
+        </div>
+    </div>
+
+    <div id="list">
+        @foreach (var item in Model)
+        {
+            <div class="card">
+                <div class="actions">
+                    <div class="btn"
+                         onclick="openEdit(this); event.stopPropagation();"
+                         data-id="@item.Id"
+                         data-name="@item.CustomerName"
+                         data-date="@item.Date"
+                         data-time="@item.Time"
+                         data-guests="@item.GuestCount"
+                         data-table="@item.TableInfo"
+                         data-status="@item.Status">
+                        ✏️
+                    </div>
+
+                    <div class="btn btn-delete"
+                         onclick="deleteItem(@item.Id); event.stopPropagation();">
+                        🗑️
+                    </div>
+                </div>
+
+                <h3>@item.CustomerName</h3>
+                <div>📅 @item.Date</div>
+                <div>⏰ @item.Time</div>
+                <div>👥 Guests: @item.GuestCount</div>
+                <div>🪑 @item.TableInfo</div>
+
+                <div>
+                    Status:
+                    <span class="@(item.Status == "Confirmed" ? "status-confirmed" :
+                                   item.Status == "Pending" ? "status-pending" : "status-cancelled")">
+                        @item.Status
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+<!-- CREATE MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+
+        <h3>New Reservation</h3>
+
+        <input id="customerName" placeholder="Customer Name" />
+        <input id="customerPhone" placeholder="Phone" />
+        <input id="customerEmail" placeholder="Email" />
+
+        <select id="tableId"></select>
+
+        <input id="date" type="date" />
+        <input id="startTime" type="time" />
+        <input id="endTime" type="time" />
+
+        <select id="staffId"></select>
+
+        <input id="guests" placeholder="Guests" oninput="renderTables()" />
+
+        <br><br>
+
+        <button onclick="create()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+
+        <h3>Edit Reservation</h3>
+
+        <div id="editInfo"></div>
+
+        <select id="editStatus">
+            <option value="Confirmed">Confirmed</option>
+            <option value="Pending">Pending</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+
+        <br><br>
+
+        <button onclick="saveEdit()">Save</button>
+        <button onclick="closeEdit()">Cancel</button>
+
+    </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script>
+
+    let editId = null;
+    let allTables = [];
+
+    function openModal() {
+        document.getElementById('modal').style.display = 'flex';
+        setTimeout(() => renderTables(), 0); // ✅ FIX
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    async function loadTables() {
+        allTables = await fetch('/api/reservation/tables').then(r => r.json());
+        renderTables();
+    }
+
+    // ✅ FIXED CAPACITY FILTER
+    function renderTables() {
+
+        const guestsRaw = document.getElementById('guests').value;
+        const guests = parseInt(guestsRaw);
+
+        const select = document.getElementById('tableId');
+        select.innerHTML = '<option value="">Select Table</option>';
+
+        let filtered = allTables;
+
+        if (!isNaN(guests) && guests > 0) {
+            filtered = allTables.filter(t => t.capacity >= guests);
+        }
+
+        if (filtered.length === 0) {
+            select.innerHTML = '<option value="">No tables available ❗</option>';
+            return;
+        }
+
+        filtered.forEach(t => {
+            select.innerHTML += `
+                <option value="${t.tableId}">
+                    Table ${t.tableId} (cap: ${t.capacity})
+                </option>`;
+        });
+    }
+
+    async function loadStaff() {
+        const staff = await fetch('/api/reservation/staff').then(r => r.json());
+        const s = document.getElementById('staffId');
+
+        s.innerHTML = '<option value="">Select Staff</option>';
+
+        staff.forEach(x => {
+            s.innerHTML += `<option value="${x.staffId}">
+                ${x.name} (${x.role})
+            </option>`;
+        });
+    }
+
+    async function create() {
+        const data = {
+            name: document.getElementById('customerName').value,
+            phone: document.getElementById('customerPhone').value,
+            email: document.getElementById('customerEmail').value,
+            tableId: parseInt(document.getElementById('tableId').value),
+            staffId: parseInt(document.getElementById('staffId').value),
+            date: document.getElementById('date').value,
+            startTime: document.getElementById('startTime').value + ":00",
+            endTime: document.getElementById('endTime').value + ":00",
+            guestCount: parseInt(document.getElementById('guests').value)
+        };
+
+        const res = await fetch('/api/reservation/create-dto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            showToast("Created 🚀", "success");
+            setTimeout(() => location.reload(), 600);
+        } else {
+            showToast(await res.text(), "error");
+        }
+    }
+
+    function search() {
+        const val = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.card').forEach(c => {
+            c.style.display = c.innerText.toLowerCase().includes(val) ? 'block' : 'none';
+        });
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light');
+    }
+
+    function openEdit(el) {
+        editId = el.dataset.id;
+
+        document.getElementById('editInfo').innerHTML = `
+            <div><b>${el.dataset.name}</b></div>
+            <div>📅 ${el.dataset.date}</div>
+            <div>⏰ ${el.dataset.time}</div>
+            <div>👥 Guests: ${el.dataset.guests}</div>
+            <div>🪑 ${el.dataset.table}</div>
+        `;
+
+        document.getElementById('editStatus').value = el.dataset.status;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEdit() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function saveEdit() {
+        const res = await fetch('/api/reservation/' + editId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                reservationId: parseInt(editId),
+                status: document.getElementById('editStatus').value
+            })
+        });
+
+        if (res.ok) {
+            showToast("Updated ✅", "success");
+            setTimeout(() => location.reload(), 600);
+        } else {
+            showToast(await res.text(), "error");
+        }
+    }
+
+    async function deleteItem(id) {
+        const res = await fetch('/api/reservation/' + id, { method: 'DELETE' });
+
+        if (res.ok) {
+            showToast("Deleted 🗑️", "success");
+            setTimeout(() => location.reload(), 600);
+        } else {
+            showToast(await res.text(), "error");
+        }
+    }
+
+    function showToast(message, type = "success", duration = 4000) {
+        const container = document.getElementById('toastContainer');
+
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+
+        toast.innerHTML = `
+            ${message}
+            <span class="close">✖</span>
+            <div class="progress" style="animation-duration:${duration}ms"></div>
+        `;
+
+        container.appendChild(toast);
+
+        toast.querySelector('.close').onclick = () => toast.remove();
+
+        setTimeout(() => toast.remove(), duration);
+    }
+
+    loadTables();
+    loadStaff();
+
+</script>
